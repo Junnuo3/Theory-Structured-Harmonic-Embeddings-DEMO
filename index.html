@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Theory Structured Harmonic Embeddings for Chord Conditioned Melody Generation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Main stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Page header with title and nav -->
+  <header class="site-header">
+    <div class="header-inner">
+      <h1 class="paper-title">Theory Structured Harmonic Embeddings for Chord Conditioned Melody Generation</h1>
+
+      <!-- Top navigation with anchor links -->
+      <nav class="top-nav">
+        <a href="#overview">Overview</a>
+        <a href="#listening-examples">Listening Examples</a>
+        <a href="#lambda-effect">Effect of Constraint Strength</a>
+        <a href="#paper-code">Paper</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main content column -->
+  <main class="content">
+    <!-- Overview section -->
+    <section id="overview" class="section">
+      <h2>Overview</h2>
+      <p>
+        Most chord conditioned melody models only see coarse chord information such as root and quality, so they struggle with extended
+        and altered chords and often mishandle tension, resolution, and harmonic motion.
+      </p>
+      <p>
+        We propose a <strong>Theory Structured Harmonic Embedding</strong> that represents each chord as a sum of four interpretable parts:
+        Root, Quality, Extension, and Tension. This keeps the chord vocabulary manageable while giving fine-grained, theory-aware control
+        over how the model responds to harmony.
+      </p>
+      <p>
+        At inference time, <strong>Harmony Aware Soft Constrained Decoding</strong> adjusts pitch logits using music theory priors on
+        chord tones, allowed tensions, non chord tone resolution, and scale membership. A single scalar λ controls constraint strength and
+        the tradeoff between theory alignment and diversity. Our model improves chord tone ratio, tension correctness, and non chord tone
+        resolution over both a CMT style baseline and an EC2 VAE baseline, while keeping pitch and rhythm statistics close to the dataset
+        under MGEval.
+      </p>
+    </section>
+
+    <!-- Listening Examples section -->
+    <section id="listening-examples" class="section">
+      <h2>Listening Examples: Comparing Models on the Same Chord Progressions</h2>
+      <p>
+        We compare three models that generate melodies over the same chord progressions:
+        a CMT-style baseline, an EC2-VAE baseline, and our full model with theory structured harmonic embeddings and harmony aware
+        soft constrained decoding. For each case below, all three audio clips use the <strong>same chord progression</strong>, so
+        differences highlight how each model handles chord tones, tensions, and resolution.
+      </p>
+
+      <!-- Case 1 -->
+      <article class="case-card">
+        <h3>Case 1: Chord progression #3</h3>
+        <div class="audio-grid">
+          <div class="audio-item">
+            <div class="audio-label">CMT baseline</div>
+            <audio controls preload="none">
+              <source src="audio/3cmt.mp3" type="audio/mpeg">
+              Your browser does not support the audio element.
+            </audio>
+          </div>
+          <div class="audio-item">
+            <div class="audio-label">EC2-VAE baseline</div>
+            <audio controls preload="none">
+              <source src="audio/3vae.mp3" type="audio/mpeg">
+              Your browser does not support the audio element.
+            </audio>
+          </div>
+          <div class="audio-item">
+            <div class="audio-label">Our model</div>
+            <audio controls preload="none">
+              <source src="audio/3ourmodel.mp3" type="audio/mpeg">
+              Your browser does not support the audio element.
+            </audio>
+          </div>
+        </div>
+      </article>
+
+      <!-- Case 2 -->
+      <article class="case-card">
+        <h3>Case 2: Chord progression #5</h3>
+        <div class="audio-grid">
+          <div class="audio-item">
+            <div class="audio-label">CMT baseline</div>
+            <audio controls preload="none">
+              <source src="audio/5cmt.mp3" type="audio/mpeg">
+              Your browser does not support the audio element.
+            </audio>
+          </div>
+          <div class="audio-item">
+            <div class="audio-label">EC2-VAE baseline</div>
+            <audio controls preload="none">
+              <source src="audio/5vae.mp3" type="audio/mpeg">
+              Your browser does not support the audio element.
+            </audio>
+          </div>
+          <div class="audio-item">
+            <div class="audio-label">Our model</div>
+            <audio controls preload="none">
+              <source src="audio/5ourmodel.mp3" type="audio/mpeg">
+              Your browser does not support the audio element.
+            </audio>
+          </div>
+        </div>
+      </article>
+
+      <!-- Case 3 -->
+      <article class="case-card">
+        <h3>Case 3: Chord progression #14</h3>
+        <div class="audio-grid">
+          <div class="audio-item">
+            <div class="audio-label">CMT baseline</div>
+            <audio controls preload="none">
+              <source src="audio/14cmt.mp3" type="audio/mpeg">
+              Your browser does not support the audio element.
+            </audio>
+          </div>
+          <div class="audio-item">
+            <div class="audio-label">EC2-VAE baseline</div>
+            <audio controls preload="none">
+              <source src="audio/14vae.mp3" type="audio/mpeg">
+              Your browser does not support the audio element.
+            </audio>
+          </div>
+          <div class="audio-item">
+            <div class="audio-label">Our model</div>
+            <audio controls preload="none">
+              <source src="audio/14ourmodel.mp3" type="audio/mpeg">
+              Your browser does not support the audio element.
+            </audio>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <!-- Effect of Lambda section -->
+    <section id="lambda-effect" class="section">
+      <h2>Effect of Constraint Strength λ</h2>
+      <p>
+        In this section we use our full model on a fixed chord progression and vary the soft constraint strength parameter λ at
+        inference time. Higher λ encourages more theory-aligned behavior, such as stronger chord tone usage and more consistent
+        tension resolution, while potentially reducing some aspects of free melodic variety.
+      </p>
+
+      <div class="lambda-audio-grid">
+        <div class="audio-item">
+          <div class="audio-label">λ = 0 (no soft constraints)</div>
+          <audio controls preload="none">
+            <source src="audio/lamda0.mp3" type="audio/mpeg">
+            Your browser does not support the audio element.
+          </audio>
+        </div>
+        <div class="audio-item">
+          <div class="audio-label">λ = 0.5 (default setting in the paper)</div>
+          <audio controls preload="none">
+            <source src="audio/lamda0.5.mp3" type="audio/mpeg">
+            Your browser does not support the audio element.
+          </audio>
+        </div>
+        <div class="audio-item">
+          <div class="audio-label">λ = 1.0 (strong constraints)</div>
+          <audio controls preload="none">
+            <source src="audio/lamda1.mp3" type="audio/mpeg">
+            Your browser does not support the audio element.
+          </audio>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Paper and Code section -->
+    <section id="paper-code" class="section">
+      <h2>Paper</h2>
+      <p>
+        For more details about the model architecture, training procedure, and evaluation, please refer to the full paper below.
+      </p>
+      <p class="links-row">
+        <a
+          href="https://drive.google.com/file/d/1oBXxGm2M-U_4HOHgO3Ndz6wggdnauycN/view?usp=sharing"
+          class="primary-link"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          PDF
+        </a>
+      </p>
+    </section>
+  </main>
+
+  <!-- Simple footer -->
+  <footer class="site-footer">
+    <p>&copy; <span id="year"></span> Junnuo Wang. All rights reserved.</p>
+  </footer>
+
+  <!-- Small inline script for dynamic year (no separate JS file needed) -->
+  <script>
+    // Update footer year dynamically
+    (function () {
+      const yearSpan = document.getElementById('year');
+      if (yearSpan) {
+        yearSpan.textContent = new Date().getFullYear();
+      }
+    })();
+  </script>
+</body>
+</html>
+
+
